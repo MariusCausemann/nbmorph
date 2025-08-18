@@ -1,5 +1,6 @@
 import numpy as np
 import numba
+from .utils import border_update3D
 
 @numba.njit(parallel=True, cache=True)
 def loop_axis(data, out, op, axis:int):
@@ -20,18 +21,21 @@ def loop_axis(data, out, op, axis:int):
 def filter_3d_separable(data, op, out=None):
     # Allocate temporary arrays
     if out is None:
-        out = np.empty_like(data)
+        out = np.zeros_like(data)
     temp1 = out
-    temp2 = np.empty_like(data)
+    temp2 = np.zeros_like(data)
     
     # Pass 1: Filter along axis 2
     loop_axis(data, out=temp1, op=op, axis=2)
+    border_update3D(temp1)
     
     # Pass 2: Filter along axis 1
     loop_axis(temp1, out=temp2, op=op, axis=1)
+    border_update3D(temp2)
 
     # Pass 3: Filter along axis 0
     loop_axis(temp2, out=out, op=op, axis=0)
+
     return out
 
 @numba.njit(cache=True)

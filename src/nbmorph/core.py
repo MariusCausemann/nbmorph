@@ -54,7 +54,7 @@ def erode_labels_spherical(labels: np.ndarray, radius: int=1,
     """
     assert radius > 0
     pong = np.copy(labels)
-    ping = np.empty_like(pong)
+    ping = np.zeros_like(pong)
 
     if struct_sequence[0]=="D":
         zero_label_edges_diamond(pong, out=ping)
