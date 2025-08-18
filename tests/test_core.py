@@ -100,14 +100,10 @@ def test_minimum_box():
     assert result[1, 1, 1] == 1
 
 def test_minimum_box2():
-    """Tests that minimum_box finds the minimum value in a 3x3x3 neighborhood."""
-    # Arrange: A 3x3x3 cube with a 1 in the corner, rest are higher
     labels = np.zeros((1,5,5), dtype=np.uint8)
     labels[:, 1:4, 1:4] = 1
-
-    # Act
-    result = nbmorph.minimum_box(pad(labels))[1:-1, 1:-1, 1:-1]
-
+    padded = pad(labels)
+    result = nbmorph.minimum_box(padded)[1:-1, 1:-1, 1:-1]
     # Assert: The center pixel should become 1
     assert result[0, 2, 2] == 1
     assert result.sum() == 1
@@ -227,8 +223,6 @@ def test_erosion_radius_2():
     # Assert: The expected result is a single pixel at the center.
     expected = np.zeros_like(initial_labels)
     expected[3, 3, 3] = 1
-    print(initial_labels)
-    print(result)
     assert_array_equal(result, expected)
 
 @pytest.mark.parametrize("radius", [1,2,3,4,5, 6])
