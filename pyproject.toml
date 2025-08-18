@@ -1,0 +1,35 @@
+# pyproject.toml
+
+[project]
+name = "nbmorph"
+version = "0.1.0"
+authors = [
+  { name="Marius Causemann", email="mariusca@simula.no" },
+]
+description = "A small package with Numba-accelerated morphological operations."
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Image Processing",
+]
+dependencies = [
+    "numpy",
+    "numba",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest", "pytest-cov", "fastmorph",
+]
+
+[tool.coverage.run]
+branch = false
+
+[tool.coverage.report]
+ignore_errors = true
+
