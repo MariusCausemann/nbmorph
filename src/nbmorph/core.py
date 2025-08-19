@@ -3,7 +3,7 @@ import numba
 from .mode import onlyzero_mode_box, onlyzero_mode_diamond
 from .minmax import minimum_box, minimum_diamond
 from .zero_edges import zero_label_edges_box, zero_label_edges_diamond
-from .utils import cycle, border_update3D
+from .utils import cycle
 
 @numba.njit(cache=True)
 def dilate_labels_spherical(labels: np.ndarray, radius: int=1, 
@@ -24,7 +24,7 @@ def dilate_labels_spherical(labels: np.ndarray, radius: int=1,
 
     # Initial setup: The original data is the first "pong".
     pong = np.copy(labels)
-    ping = np.zeros_like(pong)
+    ping = np.empty_like(pong)
 
     for s in cycle(struct_sequence, radius):
         # Determine which kernel to use for this iteration
@@ -32,7 +32,6 @@ def dilate_labels_spherical(labels: np.ndarray, radius: int=1,
             onlyzero_mode_box(pong, out=ping)
         elif s=="D":
             onlyzero_mode_diamond(pong, out=ping)
-        border_update3D(ping)
 
         # --- Swap Buffers for the Next Iteration ---
         # The ping of this step becomes the pong for the next one.
@@ -54,14 +53,12 @@ def erode_labels_spherical(labels: np.ndarray, radius: int=1,
     """
     assert radius > 0
     pong = np.copy(labels)
-    ping = np.zeros_like(pong)
+    ping = np.empty_like(pong)
 
     if struct_sequence[0]=="D":
         zero_label_edges_diamond(pong, out=ping)
     elif struct_sequence[0]=="B":
         zero_label_edges_box(pong, out=ping)
-
-    border_update3D(ping)
 
     if radius==1: 
         return ping
@@ -71,7 +68,6 @@ def erode_labels_spherical(labels: np.ndarray, radius: int=1,
             minimum_box(ping, out=pong)
         elif s=="D":
             minimum_diamond(ping, out=pong)
-        border_update3D(pong)
         ping, pong = pong, ping
     return ping
 
