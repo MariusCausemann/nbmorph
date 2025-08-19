@@ -6,50 +6,6 @@ from numpy.testing import assert_array_equal
 
 numba.set_num_threads(1)
 
-pad = nbmorph.pad_nearest
-
-def test_border_update3D():
-    """Test updating the border values with their nearest neighbor."""
-    initial_array = np.arange(6).reshape((1,2,3))
-    padded = np.pad(initial_array, pad_width=1)
-    nbmorph.border_update3D(padded)
-    expected = np.array([[[0, 0, 1, 2, 2],
-                        [0, 0, 1, 2, 2],
-                        [3, 3, 4, 5, 5],
-                        [3, 3, 4, 5, 5]],
-
-                        [[0, 0, 1, 2, 2],
-                        [0, 0, 1, 2, 2],
-                        [3, 3, 4, 5, 5],
-                        [3, 3, 4, 5, 5]],
-
-                        [[0, 0, 1, 2, 2],
-                        [0, 0, 1, 2, 2],
-                        [3, 3, 4, 5, 5],
-                        [3, 3, 4, 5, 5]]])
-    assert_array_equal(padded, expected)
-
-def test_pad():
-    """Test padding the array with border values filled with their nearest neighbor."""
-    initial_array = np.arange(6).reshape((1,2,3))
-    padded = nbmorph.pad_nearest(initial_array)
-    expected = np.array([[[0, 0, 1, 2, 2],
-                        [0, 0, 1, 2, 2],
-                        [3, 3, 4, 5, 5],
-                        [3, 3, 4, 5, 5]],
-
-                        [[0, 0, 1, 2, 2],
-                        [0, 0, 1, 2, 2],
-                        [3, 3, 4, 5, 5],
-                        [3, 3, 4, 5, 5]],
-
-                        [[0, 0, 1, 2, 2],
-                        [0, 0, 1, 2, 2],
-                        [3, 3, 4, 5, 5],
-                        [3, 3, 4, 5, 5]]])
-    assert_array_equal(padded, expected)
-
-
 def test_fast_mode():
     """Tests the fast_mode function with a simple case."""
     # Test with a simple array where the mode is clear
@@ -72,7 +28,7 @@ def test_simple_mode_diamond():
     """Tests the onlyzero_mode_diamond function with a simple case."""
     initial_labels = np.zeros((1, 5, 5), dtype=np.uint8)
     initial_labels[:, 2, 2] = 1
-    result = nbmorph.onlyzero_mode_diamond(pad(initial_labels))[1:-1, 1:-1, 1:-1]
+    result = nbmorph.onlyzero_mode_diamond(initial_labels)
     expected = np.copy(initial_labels)
     expected[:, 1:4, 2] = 1
     expected[:, 2, 1:4] = 1
@@ -82,7 +38,7 @@ def test_simple_mode_box():
     """Tests the onlyzero_mode_box function with a simple case."""
     initial_labels = np.zeros((1, 5, 5), dtype=np.uint8)
     initial_labels[:, 2, 2] = 1
-    result = nbmorph.onlyzero_mode_box(pad(initial_labels))[1:-1, 1:-1, 1:-1]
+    result = nbmorph.onlyzero_mode_box(initial_labels)
     expected = np.copy(initial_labels)
     expected[:, 1:4, 1:4] = 1
     assert_array_equal(result, expected)
@@ -94,7 +50,7 @@ def test_minimum_box():
     labels[0, 0, 0] = 1
 
     # Act
-    result = nbmorph.minimum_box(pad(labels))[1:-1, 1:-1, 1:-1]
+    result = nbmorph.minimum_box(labels)
 
     # Assert: The center pixel should become 1
     assert result[1, 1, 1] == 1
@@ -102,8 +58,7 @@ def test_minimum_box():
 def test_minimum_box2():
     labels = np.zeros((1,5,5), dtype=np.uint8)
     labels[:, 1:4, 1:4] = 1
-    padded = pad(labels)
-    result = nbmorph.minimum_box(padded)[1:-1, 1:-1, 1:-1]
+    result = nbmorph.minimum_box(labels)
     # Assert: The center pixel should become 1
     assert result[0, 2, 2] == 1
     assert result.sum() == 1
@@ -115,7 +70,7 @@ def test_minimum_diamond():
     labels[1, 0, 1] = 1 # A direct neighbor
 
     # Act
-    result = nbmorph.minimum_diamond(pad(labels))[1:-1, 1:-1, 1:-1]
+    result = nbmorph.minimum_diamond(labels)
 
     # Assert: The center pixel should become 1
     assert result[1, 1, 1] == 1
@@ -128,7 +83,7 @@ def test_zero_label_edges():
     labels[:, 1:4, 2] = 2
 
     # Act
-    result = nbmorph.zero_label_edges_diamond(pad(labels))[1:-1, 1:-1, 1:-1]
+    result = nbmorph.zero_label_edges_diamond(labels)
 
     # Assert: The boundary pixels should now be 0
     assert result[0, 1, 1] == 0
@@ -139,7 +94,7 @@ def test_zero_label_edges():
     # A non-boundary pixel should be unchanged
     initial_labels = np.zeros((1,5,5), dtype=np.uint8)
     initial_labels[:, 1:4, 1:4] = 1
-    result = nbmorph.zero_label_edges_diamond(pad(initial_labels))[1:-1, 1:-1, 1:-1]
+    result = nbmorph.zero_label_edges_diamond(initial_labels)
     expected = np.zeros_like(initial_labels)
     expected[:, 2, 2] = 1
     assert_array_equal(result, expected)
@@ -156,7 +111,7 @@ def test_radius_fastmorph(radius):
     # fastmorph computes the exact discrete sphere using the euclidian distance transform
     exact = fm.spherical_dilate(initial_labels==1, radius=radius).astype(np.int8)
     # we approximate the sphere with a diamond and box element
-    approx = nbmorph.dilate_labels_spherical(pad(initial_labels), radius=radius)[1:-1, 1:-1, 1:-1]
+    approx = nbmorph.dilate_labels_spherical(initial_labels, radius=radius)
     # less than 30 % error:
     assert abs(approx - exact).sum() / exact.sum() < 0.3
 
@@ -176,7 +131,7 @@ def test_erode_labels_spherical():
     expected_result[2, 2, 2] = 1
     
     # 2. Act: Run the erosion function
-    result = nbmorph.erode_labels_spherical(pad(initial_labels))[1:-1, 1:-1, 1:-1]
+    result = nbmorph.erode_labels_spherical(initial_labels)
 
     # 3. Assert: Check the result
     assert_array_equal(result, expected_result)
@@ -199,7 +154,7 @@ def test_dilate_labels_spherical():
                                 [0, 0, 0, 0, 0]]])
 
     # 2. Act: Run the function we want to test
-    result = nbmorph.dilate_labels_spherical(pad(initial_labels))[1:-1, 1:-1, 1:-1]
+    result = nbmorph.dilate_labels_spherical(initial_labels)
 
     # 3. Assert: Check if the result matches our expectation
     assert result.shape == initial_labels.shape
@@ -218,7 +173,7 @@ def test_erosion_radius_2():
     initial_labels[1:6, 1:6, 1:6] = 1
 
     # Act: Erode with radius=2
-    result = nbmorph.erode_labels_spherical(pad(initial_labels),radius=2)[1:-1, 1:-1, 1:-1]
+    result = nbmorph.erode_labels_spherical(initial_labels,radius=2)
 
     # Assert: The expected result is a single pixel at the center.
     expected = np.zeros_like(initial_labels)
@@ -233,8 +188,8 @@ def test_dilate_erode_dual(radius):
     initial_labels = np.zeros((1, 17, 17), dtype=np.uint8)
     initial_labels[:, 8, 8] = 1
 
-    dil = nbmorph.dilate_labels_spherical(pad(initial_labels),radius=radius)[1:-1, 1:-1, 1:-1]
-    res = nbmorph.erode_labels_spherical(pad(dil),radius=radius)[1:-1, 1:-1, 1:-1]
+    dil = nbmorph.dilate_labels_spherical(initial_labels,radius=radius)
+    res = nbmorph.erode_labels_spherical(dil,radius=radius)
     
     assert_array_equal(initial_labels, res)
 
@@ -247,7 +202,7 @@ def test_multiple_labels_do_not_interfere():
     initial_labels[:, 2, :2] = 2  # Label 2
 
     # Act: Dilate by 1 pixel
-    result = nbmorph.dilate_labels_spherical(pad(initial_labels))[1:-1, 1:-1, 1:-1]
+    result = nbmorph.dilate_labels_spherical(initial_labels)
     expected = np.array([[[0, 1, 1],
                          [1, 1, 1],
                          [2, 2, 1],
@@ -262,7 +217,7 @@ def test_different_dtypes(dtype):
     initial_labels[2, 2, 2] = 10 # Use a value that fits in all types
 
     # Act
-    dilated = nbmorph.dilate_labels_spherical(pad(initial_labels))[1:-1, 1:-1, 1:-1]
+    dilated = nbmorph.dilate_labels_spherical(initial_labels)
     
     # Assert
     assert dilated.dtype == dtype
@@ -277,7 +232,7 @@ def test_opening_removes_small_noise():
     labels[:, 2, 2] = 2       # The noise pixel
 
     # Act: Perform an opening with radius 1
-    result = nbmorph.open_labels_spherical(pad(labels))[1:-1, 1:-1, 1:-1]
+    result = nbmorph.open_labels_spherical(labels)
 
     # Assert: The noise pixel should be gone
     assert result[0, 0, 0] == 0
@@ -299,7 +254,7 @@ def test_closing_fills_small_holes():
     labels[:, 3, 3] = 0  # Create the hole
 
     # Act: Perform a closing operation
-    result = nbmorph.close_labels_spherical(pad(labels), radius=1)[1:-1, 1:-1, 1:-1]
+    result = nbmorph.close_labels_spherical(labels, radius=1)
 
     assert (result[2:-2, 2:-2] == 1).all()
     assert result.sum() == 9
@@ -338,7 +293,7 @@ def test_smoothing_removes_protrusions_and_fills_holes():
     labels[:, 5, 5] = 0
 
     # Act: Perform a smoothing operation
-    result = nbmorph.smooth_labels_spherical(pad(labels), radius=1, iterations=1)[1:-1, 1:-1, 1:-1]
+    result = nbmorph.smooth_labels_spherical(labels, radius=1, iterations=1)
 
     # Assert 1: The hole should be filled.
     assert result[:, 5, 5] == 1, "Smoothing should have filled the internal hole"
