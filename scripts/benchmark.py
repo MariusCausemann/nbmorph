@@ -19,7 +19,6 @@ numba.set_num_threads(nthreads)
 print(f"using {numba.get_num_threads()} threads")
 
 # Benchmark nbmorph functions
-print("\nBenchmarking nbmorph functions...")
 img = nbmorph.erode_labels_spherical(img, radius=3)
 nnz = (img==0).sum()
 print(f"max label: {img.max()}, img zero: share {100*nnz / img.flatten().shape[0]: .1f}%")
@@ -53,9 +52,13 @@ basicfunctions = {#"nbmorph.dilate_labels_spherical":lambda: nbmorph.dilate_labe
 #fm_dil = fastmorph.dilate(img, background_only=True, parallel=nthreads)
 #nbm_dil = nbmorph.onlyzero_mode_box(img)
 #print((fm_dil[1:-1,1:-1,1:-1] != nbm_dil[1:-1,1:-1,1:-1]).sum())
+
+print("\ncompiling functions:")
 for name, func in basicfunctions.items():
+    print(name)
     func()
     
+print("\nBenchmarking nbmorph functions...")
 for name, func in basicfunctions.items():
     t = timeit(func, number=n)
     print(f"{name} (radius={radius}): {t/n:.4f} seconds")
