@@ -10,17 +10,16 @@ numba.set_num_threads(1)
 print("Loading data...")
 img = np.load("data/dense_cells.npz")["arr_0"][:,:,19:20]
 print(f"Data shape: {img.shape}, dtype: {img.dtype}")
-#img = nbmorph.erode_labels_spherical(img, radius=1)
-# Take a central slice for plotting
+
 slice_index = 0
 img_slice = img[:,:,slice_index].copy()
 
 # Define the grid of parameters
-radii = [1, 2, 3, 4]
-iterations = [1, 2, 4, 8]
+radii = [1, 2, 4]
+iterations = [1, 2, 4, 16]
 
 # Create a 4x4 plot
-fig, axes = plt.subplots(4, 4, figsize=(12, 12))
+fig, axes = plt.subplots(len(radii), len(iterations), figsize=(12, 9))
 fig.suptitle('Effect of Morphological Smoothing', fontsize=16)
 
 # Plot the original slice for reference in the first subplot
@@ -36,9 +35,9 @@ for i, radius in enumerate(radii):
         # Apply morphological smoothing
         smoothed_img = nbmorph.smooth_labels_spherical(
             img, radius=radius, iterations=iteration)
-
-        #smoothed_img = nbmorph.dilate_labels_spherical(smoothed_img, radius=5)
-        #smoothed_img = nbmorph.erode_labels_spherical(smoothed_img, radius=1)
+        
+        smoothed_img = nbmorph.dilate_labels_spherical(smoothed_img, radius=15)
+        smoothed_img = nbmorph.erode_labels_spherical(smoothed_img, radius=1)
 
         # Get the same slice from the smoothed image
         smoothed_slice = smoothed_img[:,:,slice_index]
@@ -52,6 +51,6 @@ for i, radius in enumerate(radii):
         #ax.axis('off')
 
 # Adjust layout and save the plot
-plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+plt.tight_layout(rect=[0, 0.00, 1, 0.99])
 plt.savefig('img/smoothing_effect.png')
 print("Plot saved to smoothing_effect.png")
