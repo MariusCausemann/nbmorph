@@ -3,7 +3,6 @@ import pytest
 import nbmorph
 import numba
 from numpy.testing import assert_array_equal
-
 numba.set_num_threads(1)
 
 def test_fast_mode():
@@ -144,14 +143,14 @@ def test_dilate_labels_spherical():
     if its direct neighbors are filled after one iteration of dilation.
     """
     # 1. Arrange: Create a 5x5x5 array with one pixel set to 1 in the center
-    initial_labels = np.zeros((1, 5, 5), dtype=np.uint8)
+    initial_labels = np.zeros((5, 5, 5), dtype=np.uint8)
     initial_labels[:, 2, 2] = 1
 
     expected_result = np.array([[[0, 0, 0, 0, 0],
                                 [0, 0, 1, 0, 0],
                                 [0, 1, 1, 1, 0],
                                 [0, 0, 1, 0, 0],
-                                [0, 0, 0, 0, 0]]])
+                                [0, 0, 0, 0, 0]]]).repeat(5, axis=0)
 
     # 2. Act: Run the function we want to test
     result = nbmorph.dilate_labels_spherical(initial_labels)
