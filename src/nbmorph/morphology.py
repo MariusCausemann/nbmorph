@@ -71,7 +71,7 @@ def erode_labels_spherical(labels: np.ndarray, radius: int=1,
         ping, pong = pong, ping
     return ping
 
-@numba.njit
+#@numba.njit
 def open_labels_spherical(labels: np.ndarray, radius: int=1, iterations:int=1) -> np.ndarray:
     """
     Performs a morphological opening on a labeled image.
@@ -84,12 +84,13 @@ def open_labels_spherical(labels: np.ndarray, radius: int=1, iterations:int=1) -
     Returns:
         np.ndarray: The opened labeled image.
     """
+    out = np.copy(labels)
     for i in range(iterations):
-        labels = erode_labels_spherical(labels, radius)
-        labels = dilate_labels_spherical(labels, radius)
-    return labels
+        out = erode_labels_spherical(out, radius)
+        out = dilate_labels_spherical(out, radius)
+    return out
 
-@numba.njit
+#@numba.njit
 def close_labels_spherical(labels: np.ndarray, radius: int, iterations:int=1) -> np.ndarray:
     """
     Performs a morphological closing on a labeled image.
@@ -102,12 +103,16 @@ def close_labels_spherical(labels: np.ndarray, radius: int, iterations:int=1) ->
     Returns:
         np.ndarray: The closed labeled image.
     """
+    out = np.copy(labels)
+    #print("closing...")
     for i in range(iterations):
-        labels = dilate_labels_spherical(labels, radius)
-        labels = erode_labels_spherical(labels, radius)
-    return labels
+        out1 = dilate_labels_spherical(out, radius)
+        #print(f"after dilate: {out1.sum()}")
+        out = erode_labels_spherical(out1, radius)
+        #print(f"after erode: {out.sum()}")
+    return out
 
-@numba.njit
+#@numba.njit
 def smooth_labels_spherical(labels: np.ndarray, radius: int, iterations:int=1) -> np.ndarray:
     """
     Performs a morphological smoothing on a labeled image.

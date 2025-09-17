@@ -1,38 +1,22 @@
 import numpy as np
 import numba
-from .loop_kernels import (diamond_loop_padded, loop_axis0_padded, 
-                          loop_axis1_padded, loop_axis2_padded)
+from .diamond_kernel import diamond_loop_padded 
+from .box_kernel import kernel3x3x3
 
 @numba.njit(cache=True)
-def filter_3d_separable(data, op, out=None):
-    # Allocate temporary arrays
-    if out is None:
-        out = np.empty_like(data)
-    temp1 = out
-    temp2 = np.empty_like(data)
-    
-    # Pass 1: Filter along axis 2
-    loop_axis2_padded(data, out=temp1, op=op)
-    # Pass 2: Filter along axis 1
-    loop_axis1_padded(temp1, out=temp2, op=op)
-    # Pass 3: Filter along axis 0
-    loop_axis0_padded(temp2, out=out, op=op)
-    return out
+def minimum_box(a, out=None,onlyzero=False):
+    return kernel3x3x3(a, opname="min", out=out, onlyzero=onlyzero)
 
 @numba.njit(cache=True)
-def minimum_box(a, out=None):
-    return filter_3d_separable(a, min, out=out)
+def maximum_box(a, out=None,onlyzero=False):
+    return kernel3x3x3(a, opname="max", out=out, onlyzero=onlyzero)
 
 @numba.njit(cache=True)
-def maximum_box(a, out=None):
-    return filter_3d_separable(a, max, out=out)
+def minimum_diamond(data, out=None, onlyzero=False):
+    return diamond_loop_padded(data, opname="min", out=out, onlyzero=onlyzero)
 
 @numba.njit(cache=True)
-def minimum_diamond(data, out=None):
-    return diamond_loop_padded(data, out=out, opname="min")
-
-@numba.njit(cache=True)
-def maximum_diamond(data, out=None):
-    return diamond_loop_padded(data, out=out, opname="max")
+def maximum_diamond(data, out=None, onlyzero=False):
+    return diamond_loop_padded(data, opname="max", out=out, onlyzero=onlyzero)
 
 
