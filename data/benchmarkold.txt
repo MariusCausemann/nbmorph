@@ -1,0 +1,24 @@
+Loading data...
+Data shape: (250, 250, 500), dtype: uint16
+using 1 threads
+max label: 1681, img zero: share  66.3%
+
+compiling functions:
+fastmorph.dilate
+nbmorph.onlyzero_mode_box
+nbmorph.onlyzero_mode_diamond
+nbmorph.minimum_diamond
+nbmorph.minimum_box
+nbmorph.maximum_box
+nbmorph.zero_label_edges_box
+nbmorph.zero_label_edges_diamond
+
+Benchmarking nbmorph functions...
+fastmorph.dilate (radius=1): 0.4979 seconds
+nbmorph.onlyzero_mode_box (radius=1): 0.6075 seconds
+nbmorph.onlyzero_mode_diamond (radius=1): 0.0948 seconds
+nbmorph.minimum_diamond (radius=1): 0.0133 seconds
+nbmorph.minimum_box (radius=1): 0.0305 seconds
+nbmorph.maximum_box (radius=1): 0.0328 seconds
+nbmorph.zero_label_edges_box (radius=1): 0.0783 seconds
+nbmorph.zero_label_edges_diamond (radius=1): 0.0185 seconds
