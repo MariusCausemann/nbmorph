@@ -15,18 +15,12 @@ slice_index = 0
 img_slice = img[:,:,slice_index].copy()
 
 # Define the grid of parameters
-radii = [1, 2, 4]
-iterations = [1, 2, 4, 16]
+radii = [1, 4, 8]
+iterations = [1, 2, 4, 8]
 
 # Create a 4x4 plot
 fig, axes = plt.subplots(len(radii), len(iterations), figsize=(12, 9))
 fig.suptitle('Effect of Morphological Smoothing', fontsize=16)
-
-# Plot the original slice for reference in the first subplot
-axes[0, 0].imshow(img_slice, cmap='viridis')
-axes[0, 0].set_title('Original')
-axes[0, 0].axis('off')
-
 
 for i, radius in enumerate(radii):
     for j, iteration in enumerate(iterations):
@@ -34,9 +28,8 @@ for i, radius in enumerate(radii):
         
         # Apply morphological smoothing
         smoothed_img = nbmorph.smooth_labels_spherical(
-            img, radius=radius, iterations=iteration)
+            img, radius=radius, iterations=iteration, dilate_radius=radius)
         
-        smoothed_img = nbmorph.dilate_labels_spherical(smoothed_img, radius=15)
         smoothed_img = nbmorph.erode_labels_spherical(smoothed_img, radius=1)
 
         # Get the same slice from the smoothed image
