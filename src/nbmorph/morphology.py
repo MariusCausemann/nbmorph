@@ -4,7 +4,6 @@ from .mode import onlyzero_mode_box, onlyzero_mode_diamond
 from .minmax import minimum_box, minimum_diamond
 from .zero_edges import zero_label_edges_box, zero_label_edges_diamond
 from .utils import cycle
-import fastmorph
 
 @numba.njit(cache=True)
 def dilate_labels_spherical(labels: np.ndarray, radius: int=1, 
@@ -13,12 +12,14 @@ def dilate_labels_spherical(labels: np.ndarray, radius: int=1,
     Performs fast, quasi-spherical multilabel dilation on a CPU.
     This approximates a spherical structuring element by alternating between a box (3x3x3)
     and a diamond (6-connected) kernel for each iteration.
+
     Args:
-        labels: The input 3D labeled image (must be an integer type).
-        radius: The dilation radius in voxels. Each iteration expands by one voxel.
+        labels (np.ndarray): The input 3D labeled image (must be an integer type).
+        radius (int, optional): The dilation radius in voxels. Each iteration expands by one voxel. Defaults to 1.
+        struct_sequence (str, optional): The sequence of structuring elements to use. "D" for diamond, "B" for box. Defaults to "DDB".
 
     Returns:
-        The dilated 3D labeled image.
+        np.ndarray: The dilated 3D labeled image.
     """
     # Use two buffers that are swapped (ping-pong) to propagate labels iteratively
     # We start by copying the original labels to both
@@ -46,11 +47,12 @@ def erode_labels_spherical(labels: np.ndarray, radius: int=1,
     Performs fast, quasi-spherical multilabel erosion on a CPU.
 
     Args:
-        labels (np.ndarray): The input 3D labeled image.
-        radius (int, optional): The erosion radius. Defaults to 1.
+        labels (np.ndarray): The input 3D labeled image (must be an integer type).
+        radius (int, optional): The erosion radius in voxels. Each iteration shrinks by one voxel. Defaults to 1.
+        struct_sequence (str, optional): The sequence of structuring elements to use. "D" for diamond, "B" for box. Defaults to "DDB".
 
     Returns:
-        np.ndarray: The eroded labeled image.
+        np.ndarray: The eroded 3D labeled image.
     """
     assert radius > 0
     pong = np.copy(labels)
@@ -78,12 +80,12 @@ def open_labels_spherical(labels: np.ndarray, radius: int=1, iterations:int=1) -
     Performs a morphological opening on a labeled image.
 
     Args:
-        labels (np.ndarray): The input 3D labeled image.
-        radius (int): The radius of the spherical structuring element.
+        labels (np.ndarray): The input 3D labeled image (must be an integer type).
+        radius (int, optional): The radius of the spherical structuring element. Defaults to 1.
         iterations (int, optional): The number of iterations. Defaults to 1.
 
     Returns:
-        np.ndarray: The opened labeled image.
+        np.ndarray: The opened 3D labeled image.
     """
     out = np.copy(labels)
     for i in range(iterations):
@@ -97,12 +99,12 @@ def close_labels_spherical(labels: np.ndarray, radius: int, iterations:int=1) ->
     Performs a morphological closing on a labeled image.
 
     Args:
-        labels (np.ndarray): The input 3D labeled image.
+        labels (np.ndarray): The input 3D labeled image (must be an integer type).
         radius (int): The radius of the spherical structuring element.
         iterations (int, optional): The number of iterations. Defaults to 1.
 
     Returns:
-        np.ndarray: The closed labeled image.
+        np.ndarray: The closed 3D labeled image.
     """
     out = np.copy(labels)
     for i in range(iterations):
@@ -117,12 +119,13 @@ def smooth_labels_spherical(labels: np.ndarray, radius: int,
     Performs a morphological smoothing on a labeled image.
 
     Args:
-        labels (np.ndarray): The input 3D labeled image.
+        labels (np.ndarray): The input 3D labeled image (must be an integer type).
         radius (int): The radius of the spherical structuring element.
         iterations (int, optional): The number of iterations. Defaults to 1.
+        dilate_radius (int, optional): Additional dilation radius to apply after smoothing. Defaults to 0.
 
     Returns:
-        np.ndarray: The smoothed labeled image.
+        np.ndarray: The smoothed 3D labeled image.
     """
     out = np.copy(labels)
     for i in range(iterations):

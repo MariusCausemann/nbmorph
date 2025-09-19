@@ -5,10 +5,38 @@ from .ops import choose_op
 
 @numba.njit(inline="always")
 def clamp(index, size):
+    """
+    Clamps an index to valid bounds for a 3x3 neighborhood.
+
+    This function calculates the valid range for a 3x3 neighborhood around a given index,
+    ensuring it stays within the array bounds.
+
+    Args:
+        index (int): The center index.
+        size (int): The size of the array dimension.
+
+    Returns:
+        Tuple[int, int]: The lower and upper bounds for the neighborhood.
+    """
     return max(0,index-1), min(index+1, size-1)
   
 @numba.njit(parallel=True, cache=True)
 def diamond_loop_padded(data, opname:str, out=None, onlyzero=False):
+    """
+    Applies a morphological operation using a diamond (6-connected) kernel to a 3D array.
+
+    This function processes each voxel in the array, applying the specified operation
+    to its 6-connected neighbors. It handles boundary conditions by padding.
+
+    Args:
+        data (np.ndarray): The input 3D array.
+        opname (str): The operation to perform ("min", "max", "zeroedges").
+        out (np.ndarray, optional): The output array. If None, a new array is created.
+        onlyzero (bool, optional): If True, only processes voxels with value 0. Defaults to False.
+
+    Returns:
+        np.ndarray: The processed 3D array.
+    """
     if out is None:
         out = np.empty_like(data)
     assert data.shape == out.shape

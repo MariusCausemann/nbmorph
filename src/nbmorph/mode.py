@@ -4,19 +4,32 @@ from .minmax import maximum_box, maximum_diamond
 
 @numba.njit
 def fast_mode(a):
-    return fast_modeN(a, len(a))
-
-@numba.njit(inline="always")
-def fast_modeN(a, N):
     """
-    Find the mode of a 1D array, ignoring zeros. This is an O(n^2) algorithm, 
-    but fast on small data (len(a) < 50), as needed here.
+    Find the mode of a 1D array, ignoring zeros.
+
+    This is an O(n^2) algorithm, but fast on small data (len(a) < 50), as needed here.
 
     Args:
         a (np.ndarray): The input 1D array.
 
     Returns:
         The mode of the array.
+    """
+    return fast_modeN(a, len(a))
+
+@numba.njit(inline="always")
+def fast_modeN(a, N):
+    """
+    Find the mode of the first N elements of a 1D array, ignoring zeros.
+
+    This is an O(n^2) algorithm, but fast on small data (N < 50), as needed here.
+
+    Args:
+        a (np.ndarray): The input 1D array.
+        N (int): The number of elements to consider.
+
+    Returns:
+        The mode of the first N elements of the array.
     """
     max_count = 0
     current_count = 0
@@ -40,7 +53,16 @@ def fast_modeN(a, N):
 
 @numba.njit(inline="always")
 def _cs(a, b):
-    """Performs a compare-swap on two values."""
+    """
+    Performs a compare-swap on two values.
+
+    Args:
+        a: First value.
+        b: Second value.
+
+    Returns:
+        Tuple containing the smaller value followed by the larger value.
+    """
     if a > b:
         return b, a
     else:
@@ -54,7 +76,15 @@ def sort26_network(
 ):
     """
     Sorts 26 elements using a pre-defined sorting network.
-    From https://bertdobbelaere.github.io/sorting_networks.html
+
+    This function implements a sorting network from https://bertdobbelaere.github.io/sorting_networks.html
+    to efficiently sort a fixed number of elements.
+
+    Args:
+        v0-v25: The 26 values to be sorted.
+
+    Returns:
+        Tuple containing the 26 input values in sorted order (ascending).
     """
     v0, v1 = _cs(v0, v1); v2, v3 = _cs(v2, v3); v4, v5 = _cs(v4, v5); v6, v7 = _cs(v6, v7); v8, v9 = _cs(v8, v9); v10, v11 = _cs(v10, v11); v12, v13 = _cs(v12, v13); v14, v15 = _cs(v14, v15); v16, v17 = _cs(v16, v17); v18, v19 = _cs(v18, v19); v20, v21 = _cs(v20, v21); v22, v23 = _cs(v22, v23); v24, v25 = _cs(v24, v25)
     v0, v2 = _cs(v0, v2); v1, v3 = _cs(v1, v3); v4, v6 = _cs(v4, v6); v5, v7 = _cs(v5, v7); v8, v10 = _cs(v8, v10); v9, v11 = _cs(v9, v11); v14, v16 = _cs(v14, v16); v15, v17 = _cs(v15, v17); v18, v20 = _cs(v18, v20); v19, v21 = _cs(v19, v21); v22, v24 = _cs(v22, v24); v23, v25 = _cs(v23, v25)
@@ -78,7 +108,15 @@ def sort26_network(
 def sort6_network(v0, v1, v2, v3, v4, v5):
     """
     Sorts 6 elements using a pre-defined sorting network.
-    From https://bertdobbelaere.github.io/sorting_networks.html
+
+    This function implements a sorting network from https://bertdobbelaere.github.io/sorting_networks.html
+    to efficiently sort a fixed number of elements.
+
+    Args:
+        v0-v5: The 6 values to be sorted.
+
+    Returns:
+        Tuple containing the 6 input values in sorted order (ascending).
     """
     v0, v5 = _cs(v0, v5)
     v1, v3 = _cs(v1, v3)
@@ -102,11 +140,20 @@ def sort6_network(v0, v1, v2, v3, v4, v5):
 @numba.njit(inline="always")
 def mode_diamond(data, z, y, x):
     """
-    Calculates the mode of a diamond neighborhood.
-    The neighborhood includes its 6 direct neighbors: 
-    (z, y, x-1), (z, y, x+1), (z, y-1, x),
-    (z, y+1, x), (z-1, y, x), (z+1, y, x).
-    """    
+    Calculates the mode of a diamond neighborhood in a 3D array.
+
+    The diamond neighborhood includes the 6 direct (6-connected) neighbors of the center point:
+    (z, y, x-1), (z, y, x+1), (z, y-1, x), (z, y+1, x), (z-1, y, x), (z+1, y, x).
+
+    Args:
+        data (np.ndarray): The 3D input array.
+        z (int): Z-coordinate of the center point.
+        y (int): Y-coordinate of the center point.
+        x (int): X-coordinate of the center point.
+
+    Returns:
+        The mode (most frequent value) of the diamond neighborhood, ignoring zeros.
+    """
 
     (v0, v1, v2, v3, v4, v5) = sort6_network(
         data[z, y, x-1], data[z, y, x+1],
@@ -140,9 +187,19 @@ def mode_diamond(data, z, y, x):
 @numba.njit(inline="always")
 def mode_box(data, z, y, x):
     """
-    Calculates the mode of a 3x3x3 neighborhood by explicitly
-    accessing all 26 neighbors.
-    """    
+    Calculates the mode of a 3x3x3 neighborhood in a 3D array.
+
+    The neighborhood includes all 26 surrounding voxels of the center point.
+
+    Args:
+        data (np.ndarray): The 3D input array.
+        z (int): Z-coordinate of the center point.
+        y (int): Y-coordinate of the center point.
+        x (int): X-coordinate of the center point.
+
+    Returns:
+        The mode (most frequent value) of the 3x3x3 neighborhood, ignoring zeros.
+    """
 
     (v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11,
     v12, v13, v14, v15, v16, v17, v18, v19, v20,
@@ -236,7 +293,26 @@ def mode_box(data, z, y, x):
 
 
 @numba.njit(inline="always")
-def load_box_stencil(data, z, y, x, sz,sy,sx, nbs):
+def load_box_stencil(data, z, y, x, sz, sy, sx, nbs):
+    """
+    Loads a 3x3x3 box stencil into a neighbors array, counting only non-zero values.
+
+    This function extracts the 26 neighbors of a center point in a 3D array, handling
+    boundary conditions appropriately.
+
+    Args:
+        data (np.ndarray): The 3D input array.
+        z (int): Z-coordinate of the center point.
+        y (int): Y-coordinate of the center point.
+        x (int): X-coordinate of the center point.
+        sz (int): Size of the array in Z-dimension.
+        sy (int): Size of the array in Y-dimension.
+        sx (int): Size of the array in X-dimension.
+        nbs (np.ndarray): Pre-allocated array to store the neighbor values.
+
+    Returns:
+        int: The number of non-zero values loaded into the neighbors array.
+    """
     z1 = -1 if z > 0 else 0; z2 = 2 if z < sz-1 else 1
     y1 = -1 if y > 0 else 0; y2 = 2 if y < sy-1 else 1
     x1 = -1 if x > 0 else 0; x2 = 2 if x < sx-1 else 1
