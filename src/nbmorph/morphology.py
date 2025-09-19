@@ -4,6 +4,7 @@ from .mode import onlyzero_mode_box, onlyzero_mode_diamond
 from .minmax import minimum_box, minimum_diamond
 from .zero_edges import zero_label_edges_box, zero_label_edges_diamond
 from .utils import cycle
+import fastmorph
 
 @numba.njit(cache=True)
 def dilate_labels_spherical(labels: np.ndarray, radius: int=1, 
@@ -71,7 +72,7 @@ def erode_labels_spherical(labels: np.ndarray, radius: int=1,
         ping, pong = pong, ping
     return ping
 
-#@numba.njit
+@numba.njit
 def open_labels_spherical(labels: np.ndarray, radius: int=1, iterations:int=1) -> np.ndarray:
     """
     Performs a morphological opening on a labeled image.
@@ -90,7 +91,7 @@ def open_labels_spherical(labels: np.ndarray, radius: int=1, iterations:int=1) -
         out = dilate_labels_spherical(out, radius)
     return out
 
-#@numba.njit
+@numba.njit
 def close_labels_spherical(labels: np.ndarray, radius: int, iterations:int=1) -> np.ndarray:
     """
     Performs a morphological closing on a labeled image.
@@ -104,16 +105,14 @@ def close_labels_spherical(labels: np.ndarray, radius: int, iterations:int=1) ->
         np.ndarray: The closed labeled image.
     """
     out = np.copy(labels)
-    #print("closing...")
     for i in range(iterations):
-        out1 = dilate_labels_spherical(out, radius)
-        #print(f"after dilate: {out1.sum()}")
-        out = erode_labels_spherical(out1, radius)
-        #print(f"after erode: {out.sum()}")
+        out = dilate_labels_spherical(out, radius)
+        out = erode_labels_spherical(out, radius)
     return out
 
-#@numba.njit
-def smooth_labels_spherical(labels: np.ndarray, radius: int, iterations:int=1) -> np.ndarray:
+@numba.njit
+def smooth_labels_spherical(labels: np.ndarray, radius: int,
+                            iterations:int=1, dilate_radius:int=0) -> np.ndarray:
     """
     Performs a morphological smoothing on a labeled image.
 
@@ -125,7 +124,10 @@ def smooth_labels_spherical(labels: np.ndarray, radius: int, iterations:int=1) -
     Returns:
         np.ndarray: The smoothed labeled image.
     """
+    out = np.copy(labels)
     for i in range(iterations):
-        labels = open_labels_spherical(labels, radius)
-        labels = close_labels_spherical(labels, radius)
-    return labels
+        out = open_labels_spherical(out, radius)
+        out = close_labels_spherical(out, radius)
+        if dilate_radius > 0:
+            out = dilate_labels_spherical(out, dilate_radius)
+    return out
