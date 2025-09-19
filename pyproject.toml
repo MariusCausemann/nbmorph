@@ -10,6 +10,7 @@ description = "A small package with Numba-accelerated morphological operations."
 readme = "README.md"
 license = { file="LICENSE" }
 requires-python = ">=3.8"
+urls = { homepage = "https://github.com/MariusCausemann/nbmorph" }
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -32,4 +33,3 @@ branch = false
 
 [tool.coverage.report]
 ignore_errors = true
-
