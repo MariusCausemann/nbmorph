@@ -6,7 +6,7 @@ A small, Numba-accelerated Python package for morphological operations on 3D lab
 
 ## Features
 
-* **Numba-accelerated:** Operations are just-in-time compiled with Numba for high performance on CPUs.
+* **Numba-accelerated and multithreaded:** Operations are just-in-time compiled with Numba for high performance on CPUs.
 
 * **3D Label Image Support:** All operations are designed for 3D labeled images (integer NumPy arrays).
 
@@ -30,10 +30,10 @@ A small, Numba-accelerated Python package for morphological operations on 3D lab
 
 ## Installation
 
-You can install `nbmorph` directly from the source directory using pip:
+You can install `nbmorph` directly from pypi using pip:
 
 ```
-pip install .
+pip install nbmorph
 
 ```
 
@@ -45,32 +45,32 @@ Here is a basic example of how to use `nbmorph` to apply morphological smoothing
 ```
 import numpy as np
 import nbmorph
+import numba
+
+numba.set_num_threads(4)
 
 # Create a sample 3D labeled image
 # For example, a 5x5x5 cube of label 1 in a 10x10x10 volume
 labels = np.zeros((10, 10, 10), dtype=np.uint16)
 labels[2:7, 2:7, 2:7] = 1
 
+# First execution may take a while due to numba compilation
+# Apply morphological erosion with a radius of 1
+eroded_labels = nbmorph.erode_labels_spherical(labels, radius=1)
+
+# Apply morphological dilation with a radius of 1
+dilated_labels = nbmorph.dilate_labels_spherical(labels, radius=1)
+
+# Apply morphological opening with a radius of 1
+opened_labels = nbmorph.open_labels_spherical(labels, radius=1)
+
+# Apply morphological closing with a radius of 1
+closed_labels = nbmorph.close_labels_spherical(labels, radius=1)
+
 # Apply morphological smoothing with a radius of 1
 smoothed_labels = nbmorph.smooth_labels_spherical(labels, radius=1)
 
-print("Smoothing complete. The smoothed labels are in the 'smoothed_labels' array.")
-
 ```
-
-## Operations
-
-The core functions of the library are:
-
-* `nbmorph.dilate_labels_spherical(labels, radius=1)`
-
-* `nbmorph.erode_labels_spherical(labels, radius=1)`
-
-* `nbmorph.open_labels_spherical(labels, radius=1, iterations=1)`
-
-* `nbmorph.close_labels_spherical(labels, radius=1, iterations=1)`
-
-* `nbmorph.smooth_labels_spherical(labels, radius=1, iterations=1)`
 
 ## Testing
 
