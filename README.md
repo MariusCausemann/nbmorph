@@ -40,7 +40,7 @@ pip install nbmorph
 
 ## Usage
 
-Here is a basic example of how to use `nbmorph` to apply morphological smoothing to a 3D labeled image.
+Here is a basic example of how to use `nbmorph` to apply operations to a 3D labeled image.
 
 ```
 import numpy as np
@@ -50,9 +50,10 @@ import numba
 numba.set_num_threads(4)
 
 # Create a sample 3D labeled image
-# For example, a 5x5x5 cube of label 1 in a 10x10x10 volume
+# For example, a 5x5x5 cube of two different labels in a 10x10x10 volume
 labels = np.zeros((10, 10, 10), dtype=np.uint16)
-labels[2:7, 2:7, 2:7] = 1
+labels[2:7, 2:7, 2:5] = 1
+labels[2:7, 2:7, 5:7] = 2
 
 # First execution may take a while due to numba compilation
 # Apply morphological erosion with a radius of 1
