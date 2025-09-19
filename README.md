@@ -1,5 +1,8 @@
 # nbmorph
 
+[![Tests](https://github.com/MariusCausemann/nbmorph/actions/workflows/test.yaml/badge.svg)](https://github.com/MariusCausemann/nbmorph/actions/workflows/test.yaml)
+[![PyPI version](https://badge.fury.io/py/nbmorph.svg)](https://badge.fury.io/py/nbmorph)
+
 A small, Numba-accelerated Python package for morphological operations on 3D labeled images.
 
 `nbmorph` provides a set of common morphological operations optimized for performance using Numba. It is designed to work with 3D NumPy arrays representing labeled image data, where different integer labels correspond to different objects.
