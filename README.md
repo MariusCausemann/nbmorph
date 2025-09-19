@@ -25,7 +25,7 @@ A small, Numba-accelerated Python package for morphological operations on 3D lab
   * `smooth_labels_spherical`: Smoothes object boundaries by performing an opening followed by a closing.
 
 ![Effect of Morphological Smoothing](img/smoothing_effect.png)
-*Demonstration of the smoothing effect with varying radii and iterations on a sample image.*
+*Demonstration of the smoothing effect with varying radii and iterations on a sample image. The smoothing is followed by a dilation operation to fill up the empty space.*
 
 
 ## Installation
@@ -70,7 +70,6 @@ closed_labels = nbmorph.close_labels_spherical(labels, radius=1)
 
 # Apply morphological smoothing with a radius of 1
 smoothed_labels = nbmorph.smooth_labels_spherical(labels, radius=1)
-
 ```
 
 ## Testing
