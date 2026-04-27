@@ -2,7 +2,7 @@
 
 [project]
 name = "nbmorph"
-version = "0.2.0"
+version = "0.3.0"
 authors = [
   { name="Marius Causemann", email="mariusca@simula.no" },
 ]
@@ -25,7 +25,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-    "pytest", "pytest-cov", "fastmorph",
+    "pytest", "pytest-cov", "fastmorph", "scipy",
 ]
 
 [tool.coverage.run]
