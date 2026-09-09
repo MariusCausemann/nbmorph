@@ -19,7 +19,7 @@ def min27(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9,
     return  min((
         min((v0, v1, v2, v3, v4, v5, v6, v7, v8)),
         min((v9, v10, v11, v12, v13, v14, v15, v16, v17)),
-        max((v18, v19, v20, v21, v22, v23, v24, v25, v26))
+        min((v18, v19, v20, v21, v22, v23, v24, v25, v26))
         ))
 
 @numba.njit(inline="always")
@@ -64,7 +64,8 @@ def choose_op27(opname,
                 v10, v11, v12, v13, v14, v15, v16, v17,v18,
                 v19, v20, v21, v22, v23, v24, v25, v26,
                 onlyzero=False):
-    if onlyzero and v0 >0: return v0
+    # v13 is the centre voxel: the 27 values arrive in z-1/z/z+1 slice order.
+    if onlyzero and v13 >0: return v13
     match opname:
         case "min": 
             return min27(v0, v1, v2, v3, v4, v5, v6, v7, v8,

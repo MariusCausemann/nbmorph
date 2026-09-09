@@ -24,3 +24,21 @@ def test_minimum_diamond():
     labels[1, 0, 1] = 1
     result = nbmorph.minimum_diamond(labels)
     assert result[1, 1, 1] == 1
+
+
+def test_minimum_box_footprint_is_full_3x3x3():
+    """A single zero voxel must spread to all 27 voxels of the box footprint."""
+    labels = np.ones((5, 5, 5), dtype=np.uint8)
+    labels[2, 2, 2] = 0
+    result = nbmorph.minimum_box(labels)
+    assert (result == 0).sum() == 27
+    assert (result[1:4, 1:4, 1:4] == 0).all()
+
+
+def test_maximum_box_footprint_is_full_3x3x3():
+    """A single high voxel must spread to all 27 voxels of the box footprint."""
+    labels = np.ones((5, 5, 5), dtype=np.uint8)
+    labels[2, 2, 2] = 5
+    result = nbmorph.maximum_box(labels)
+    assert (result == 5).sum() == 27
+    assert (result[1:4, 1:4, 1:4] == 5).all()
