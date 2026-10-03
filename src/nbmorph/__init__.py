@@ -12,4 +12,4 @@ from .utils import cycle
 from .topology import euler_characteristic, separate_labels_box
 
 # Define the package version
-__version__ = "0.3.0"
+__version__ = "0.3.2"

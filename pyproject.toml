@@ -2,7 +2,7 @@
 
 [project]
 name = "nbmorph"
-version = "0.3.1"
+version = "0.3.2"
 authors = [
   { name="Marius Causemann", email="mariusca@simula.no" },
 ]
