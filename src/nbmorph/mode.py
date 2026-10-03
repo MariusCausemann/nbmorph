@@ -460,7 +460,7 @@ def load_diamond_stencil(data, z, y, x, sz, sy, sx, nbs):
 @numba.njit
 def _mode_borders(data, out, stencil, onlyzero=True):
     sz, sy, sx = data.shape
-    nbs = np.empty(17, dtype=data.dtype)
+    nbs = np.empty(27, dtype=data.dtype)  # box stencil: up to 18 values on a face
 
     def process_point(z, y, x):
         if onlyzero and data[z, y, x] > 0:
