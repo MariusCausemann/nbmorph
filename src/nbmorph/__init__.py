@@ -1,3 +1,9 @@
+# Cached njit functions that call parallel=True code do not start numba's
+# threading layer when loaded from the on-disk cache. If such a function is the
+# first parallel call in a process, it segfaults. Launch the threads eagerly.
+from numba.np.ufunc.parallel import _launch_threads
+_launch_threads()
+
 from .morphology import (
     dilate_labels_spherical,
     erode_labels_spherical,
