@@ -14,6 +14,7 @@ from .morphology import (
 from .mode import onlyzero_mode_box, onlyzero_mode_diamond, fast_mode, mode_box, mode_diamond
 from .minmax import minimum_box, maximum_box, minimum_diamond, maximum_diamond
 from .zero_edges import zero_label_edges_box, zero_label_edges_diamond
+from .prune import prune_tips
 from .utils import cycle
 from .topology import euler_characteristic, separate_labels_box
 

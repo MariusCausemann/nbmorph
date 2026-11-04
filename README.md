@@ -27,6 +27,8 @@ A small, Numba-accelerated Python package for morphological operations on 3D lab
 
   * `smooth_labels_spherical`: Smoothes object boundaries by performing an opening followed by a closing.
 
+  * `prune_tips`: Removes voxels with at most one face neighbor of their own label (one-voxel spikes and isolated voxels). One pass by default; more passes shorten one-voxel-thick lines from their free ends.
+
 * **Mode (majority) filters:** Stencil-based mode filters built on top of compile-time sorting networks for fast, fixed-size neighborhoods. Each comes in two variants:
 
   * `onlyzero_mode_box` / `onlyzero_mode_diamond`: Fill *only* background (zero) voxels with the mode of their 3x3x3 box or 6-connected diamond neighborhood, leaving labeled voxels unchanged.
