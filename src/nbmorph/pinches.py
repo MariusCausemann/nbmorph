@@ -348,6 +348,14 @@ def _repair(img, cubes, separate_cells, constrained, topology, lut):
     return int(changed)
 
 
+def find_pinches(img):
+    """
+    Lower corners (n, 3) of the 2x2x2 cubes of the label image that contain a
+    pinch, in raster order: the pinch is at the voxel corner (i + 1, j + 1, k + 1).
+    """
+    return _find_pinched(np.asarray(img))
+
+
 def count_pinches(img):
     """Number of 2x2x2 cubes of the label image that contain a pinch."""
     return len(_find_pinched(np.asarray(img)))

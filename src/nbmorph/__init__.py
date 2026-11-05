@@ -23,7 +23,7 @@ from .homotopic import (
     dilate_labels_homotopic,
     smooth_labels_homotopic,
 )
-from .pinches import count_pinches, remove_pinches
+from .pinches import count_pinches, find_pinches, remove_pinches
 
 # Define the package version
 __version__ = "0.3.2"

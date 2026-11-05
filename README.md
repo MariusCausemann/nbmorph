@@ -35,7 +35,7 @@ A small, Numba-accelerated Python package for morphological operations on 3D lab
 
   * `erode_labels_homotopic`, `dilate_labels_homotopic`, `smooth_labels_homotopic`: The spherical operations through `homotopic_relabel`.
 
-  * `remove_pinches(labels, mode=None)` / `count_pinches`: Repairs edge and corner contacts between voxels of the same label (non-manifold surface nets). Multithreaded; `mode="connectivity"` only takes repairs that do not split a cell.
+  * `remove_pinches(labels, mode=None)` / `count_pinches` / `find_pinches`: Repairs edge and corner contacts between voxels of the same label (non-manifold surface nets). Multithreaded; `mode="connectivity"` only takes repairs that do not split a cell.
 
 * **Mode (majority) filters:** Stencil-based mode filters built on top of compile-time sorting networks for fast, fixed-size neighborhoods. Each comes in two variants:
 

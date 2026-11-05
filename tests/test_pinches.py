@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from nbmorph.pinches import count_pinches, remove_pinches
+from nbmorph.pinches import count_pinches, find_pinches, remove_pinches
 
 
 def non_manifold(img):
@@ -113,3 +113,10 @@ def test_pinch_free_image_unchanged():
     img[6:9, 2:8, 2:8] = 2
     assert count_pinches(img) == 0
     assert np.array_equal(remove_pinches(img), img)
+
+
+def test_find_pinches_edge():
+    """The edge pinch of edge_pinch() is found in the cubes along its edge."""
+    cubes = find_pinches(edge_pinch())
+    assert len(cubes) == count_pinches(edge_pinch())
+    assert (cubes[:, :2] == 3).all()  # the cubes around the edge x = y = 4
