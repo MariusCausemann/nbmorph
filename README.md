@@ -29,6 +29,14 @@ A small, Numba-accelerated Python package for morphological operations on 3D lab
 
   * `prune_tips`: Removes voxels with at most one face neighbor of their own label (one-voxel spikes and isolated voxels). One pass by default; more passes shorten one-voxel-thick lines from their free ends.
 
+* **Topology-preserving (homotopic) operations:**
+
+  * `homotopic_relabel(labels, target, mode="topology")`: Moves `labels` towards the result `target` of any operation, but relabels a voxel only if it is a simple point for the label it leaves and the label it joins, so no cell is split (`mode="connectivity"`) or gains or loses a tunnel or cavity (`mode="topology"`). The background is not constrained. Parallel over the 8 parity subfields; the result does not depend on the number of threads.
+
+  * `erode_labels_homotopic`, `dilate_labels_homotopic`, `smooth_labels_homotopic`: The spherical operations through `homotopic_relabel`.
+
+  * `remove_pinches(labels, mode=None)` / `count_pinches` / `find_pinches`: Repairs edge and corner contacts between voxels of the same label (non-manifold surface nets). Multithreaded; `mode="connectivity"` only takes repairs that do not split a cell.
+
 * **Mode (majority) filters:** Stencil-based mode filters built on top of compile-time sorting networks for fast, fixed-size neighborhoods. Each comes in two variants:
 
   * `onlyzero_mode_box` / `onlyzero_mode_diamond`: Fill *only* background (zero) voxels with the mode of their 3x3x3 box or 6-connected diamond neighborhood, leaving labeled voxels unchanged.
