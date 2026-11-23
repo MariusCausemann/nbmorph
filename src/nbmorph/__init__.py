@@ -16,7 +16,7 @@ from .minmax import minimum_box, maximum_box, minimum_diamond, maximum_diamond
 from .zero_edges import zero_label_edges_box, zero_label_edges_diamond
 from .prune import prune_tips
 from .utils import cycle
-from .topology import euler_characteristic, separate_labels_box
+from .topology import euler_characteristic, separate_labels, separate_labels_box
 
 # Define the package version
 __version__ = "0.3.2"
