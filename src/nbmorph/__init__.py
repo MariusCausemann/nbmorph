@@ -26,4 +26,4 @@ from .homotopic import (
 from .pinches import count_pinches, find_pinches, remove_pinches
 
 # Define the package version
-__version__ = "0.3.2"
+__version__ = "0.4.0"
